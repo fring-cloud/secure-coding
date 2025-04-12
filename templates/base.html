@@ -8,22 +8,25 @@
   <style>
     /* Notion 스타일 미니멀 디자인 */
     body {
-      background-color: #F7F7F7;
+      background-color: #EFEFEF;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
       color: #333;
     }
     nav {
-      background-color: #fff;
-      padding: 20px;
+      background-color: #3F7D58;
+      height:60px;
       border-bottom: 1px solid #e0e0e0;
     }
     nav a {
+      margin:0px;
       text-decoration: none;
-      color: #555;
+      color: black;
       margin-right: 15px;
       font-weight: 500;
+      align-items:center;
+      text-align: center;
     }
     .container {
       max-width: 800px;
@@ -83,15 +86,28 @@
       margin-bottom: 10px;
       background-color: #fafafa;
     }
+    .va{
+	height:60px;
+	align-items:center;
+	text-align:center;
+    }
+    .va:hover{
+	background-color:#EC5228;
+	border-radius:3px;
+    }
   </style>
 </head>
 <body>
   <nav>
     {% if session.get('user_id') %}
-      <a href="{{ url_for('dashboard') }}">대시보드</a>
-      <a href="{{ url_for('profile') }}">프로필</a>
-      <a href="{{ url_for('report') }}">신고하기</a>
-      <a href="{{ url_for('logout') }}">로그아웃</a>
+    <div style="display:flex;justify-content:space-between;">
+      <div style="display:flex; justify-content:space-between">
+	      <a href="{{ url_for('dashboard') }}"><div class="va">대시보드</div></a>
+	      <a href="{{ url_for('profile') }}"><div class="va">프로필</div></a>
+	      <a href="{{ url_for('report') }}"><div class="va">신고하기</div></a>
+      </div>
+      <a href="{{ url_for('logout') }}"><div class="va">로그아웃</div></a>
+    </div>
     {% else %}
       <a href="{{ url_for('login') }}">로그인</a>
       <a href="{{ url_for('register') }}">회원가입</a>

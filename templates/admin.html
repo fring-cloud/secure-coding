@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator</title>
+    <style>
+	a{
+		text-decoration: none;
+	}
+	li{
+		list-style:none;
+	}
+	body{
+		margin:0px;
+	}
+	h1{
+		padding: 8px 12px;
+	}
+	th,td{
+		width : 100px;
+		text-align: center;
+	}
+	.menu{
+		display:flex;
+		justify-content: space-evenly;
+		cursor : pointer;
+		background-color: gray;
+		padding-top: 15px;
+		padding-bottom: 15px;
+		
+	}
+	.ctl{
+		display:flex;
+		justify-content: space-evenly;
+	}
+	.tab{
+		background-color:lightgray;
+		border-spacing: 0px;
+	}
+	#user_sleep{
+		display: none;
+	}
+	#al_content, #w_content{
+		display: none;
+	}
+    </style>
+    <script>
+	function change(a, b){
+		document.getElementById(a).style.display='none';
+		document.getElementById(b).style.display='block';
+	}
+    </script>
+</head>
+<body>
+	<h1>{{row[]}}</h1>
+	<div style="text-align:center; background-color:gray; height:60px; font-size:40px;">admin</div>
+	<form method='POST' action="/admin" style="text-align:center; margin:10px">
+		<input type="text" id="search_user" class="search_user" name="search_user" style="width:400px;height:40px;">
+		<input type='submit' value='search' id='search_btn' class="search_btn" name="search_btn" style="height:46px;width:120;border:0px;padding:0px;cursor:pointer;background-color:lightgray;">
+	<form>
+	<a href="/admin">refresh</a>
+	<nav class="ctl">	
+		<div>
+			<div>
+				<ul class="menu">
+					<li><a href="javascript:change('user_sleep', 'user_table');">전체 사용자</a></li>
+					<li><a href="javascript:change('user_table', 'user_sleep');">휴면 사용자</a></li>
+				</ul>
+			</div>
+			<table id="user_table">
+				<tr>
+					<th> 신고 횟수</th>
+					<th> 닉네임 </th>
+					<th> 권한 </th>
+					<th> 상태 </th>
+					<th> 휴면 </th>
+					<th> 삭제 </th>
+				</tr>
+				<form method="POST" action="/user_delete">
+					{% for user in users%}
+						<tr class="tab">
+							<td>{{user.decl}}</td>
+							<td>{{user.username}}</td>
+							{%if user.privilege == 0%}
+								<td>일반 사용자</td>
+							{%else%}
+								<td>관리자</td>
+							{%endif%}
+							{%if user.status == 1%}
+								<td>사용 가능</td>
+								<td>
+									<a href="/user_freezing?sleep={{user.id}}">휴면 적용</a>
+								</td>
+						
+							{%else%}
+								<td style="color:red;">계정 정지</td>
+								<td>
+									<a href="/user_wakeup?wakeup={{user.id}}">휴면 해제</a>
+								</td>
+
+							{%endif%}
+							<td>
+								<input type="hidden" value="{{user.id}}" class="del" name="del">
+						   		<input type="submit" value="계정 삭제">
+							</td>
+						</tr>
+					{%endfor%}
+				</form>
+			</table>
+			<table id="user_sleep" style="dispaly:none;">
+				<tr>
+					<th> 신고 횟수 </th>
+					<th> 닉네임 </th>
+					<th> 권한 </th>
+					<th> 상태 </th>
+					<th> 휴면 해제 </th>
+					<th> 삭제 </th>
+				</tr>
+				<form method="POST" action="/user_delete">
+					{% for user in users%}
+						<tr class="tab">
+							{%if user.status == 0%}
+								<td>{{user.decl}}</td>
+								<td>{{user.username}}</td>
+								{%if user.privilege == 0%}
+									<td>일반 사용자</td>
+								{%else%}
+									<td>관리자</td>
+								{%endif%}
+								<td style="color:red;">계정 정지</td>
+								<td>
+									<a href="/user_wakeup?wakeup={{user.id}}">휴면 해제</a>
+								</td>
+								<td>
+									<input type="hidden" value="{{user.id}}" id="del" class="del" name="del">
+							   		<input type="submit" value="계정 삭제">
+								</td>
+							{%endif%}
+						</tr>
+					{%endfor%}
+				</form>
+			</table>
+		</div>
+		<div>
+			<div>
+				<ul class="menu">
+					<li><a href="javascript: change('al_content', 'all_content')">전체 게시물</a></li>
+					<li><a href="javascript: change('all_content', 'al_content')">신고 게시물</a></li>
+				</ul>
+			</div>
+			<table id="all_content">
+				<tr>
+					<th>1상품 이름</th>
+					<th>판매자</th>
+					<th>가격</th>
+					<th>신고 횟수</th>
+					<th>삭제</th>
+				<form method="POST" action="/content_delete">
+				</tr>
+					{%for content in contents%}
+						<tr class="tab">
+							<td>{{content.title}}</td>
+							<td>{{content.seller_id}}</td>
+							<td>{{content.price}}</td>
+							<td>{{content.decl}}</td>
+							<td>
+								<input type="hidden" value={{content.id}} name="pro_id">
+								<input type="submit" value="게시물 삭제">
+							</td>
+						</tr>
+					{%endfor%}
+				</form>
+			</table>
+			<table id="al_content" style="display:none;">
+			<tr>
+				<th>3상품 이름</th>
+				<th>판매자</th>
+				<th>가격</th>
+				<th>신고 횟수</th>
+				<th>삭제</th>
+			<form method="POST" action="/content_delete">
+			</tr>
+					{%for content in contents%}
+						<tr class="tab">
+							<td>{{content.title}}</td>
+							<td>{{content.username}}</td>
+							<td>{{content.price}}</td>
+							<td>{{content.decl}}</td>
+							<td>
+								<input type="hidden" value={{content.id}} name="pro_id">
+								<input type="submit" value="게시물 삭제">
+							</td>
+						</tr>
+					{%endfor%}
+				</form>
+			</table>
+		</div>
+		<div>
+			<div>
+				<ul class="menu">
+					<li>신고 목록</li>
+				</ul>
+			</div>
+			<table>
+				<tr>
+					<th>신고 대상</th>
+					<th>신고 내용</th>
+					<th>메세지 삭제</th>
+				</tr>
+				<form method="POST" action="/report_delete">
+				{%for report in reports%}
+					<tr class="tab">
+						<td>{{report.target_id}}</td>
+						<td>{{report.reason}}</td>
+						<td>  
+							<input type="hidden" value="{{report.id}}" name="del_report">
+							<input type="submit" value="delete">
+						</td>
+					</tr>
+				{%endfor%}
+				</form>
+			</table>
+		</div>
+	</nav>
+</body>
+</html>

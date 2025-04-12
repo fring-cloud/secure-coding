@@ -1,19 +1,52 @@
 {% extends "base.html" %}
 {% block title %}대시보드{% endblock %}
 {% block content %}
-<h2>대시보드</h2>
-<h3>등록된 상품</h3>
-<ul>
-  {% for product in products %}
-    <li>
-      <a href="{{ url_for('view_product', product_id=product.id) }}">{{ product.title }}</a>
-      - 가격: {{ product.price }}
-    </li>
-  {% endfor %}
-</ul>
-<p><a href="{{ url_for('new_product') }}">새 상품 등록</a></p>
+<style>
+	h2 {
+		margin:0px;
+	}
+	#chat{
+		display:none;
+	}
+	#production{
+		display:block;
+	}
+	.btn{
+		height:60px;
+	}
+	.btn:hover{
+		background-color:#EC5228;
+		border-radius:5px;
+	}
+</style>
+<script>
+let change = function(a, b){
+	document.getElementById(a).style.display='block';
+	document.getElementById(b).style.display="none";
+}
+</script>
 
-<h3>실시간 채팅</h3>
+<div style="display:flex; justify-content:space-evenly;background-color:#3F7D58;border-radius:4px">
+	<a href="javascript:change('production', 'chat')" style="text-decoration:none;color:black"><h2 class="btn">대시보드</h2></a>
+	<a href="javascript:change('chat', 'production')" style="text-decoration:none;color:black"><h2 class="btn">실시간 채팅</h2></a>
+</div>
+<div id="production">
+  <h3>상품</h3>
+  <ul>
+    {% for product in products %}
+      <li>
+	      <a href="{{ url_for('view_product', product_id=product.id) }}" style="text-decoration:none; color:black">
+		      <div style="display:flex; width:150px">
+			      <img src="{{product.image}}" style="width:150px; height:150px; border:1px solid #3F7D58; border-radius:10px 10px 0px 0px"></img>
+		      </div>
+		      <div style="background-color:#99BC85; width:150px; border-radius:0px 0px 10px 10px">{{product.title}}<br/>- price : {{product.price}}</div>
+	      </a>
+      </li>
+    {% endfor %}
+  </ul>
+  <p><a href="{{ url_for('new_product') }}">새 상품 등록</a></p>
+</div>
+
 <div id="chat">
   <ul id="messages"></ul>
   <input id="chat_input" type="text" placeholder="메시지를 입력하세요">

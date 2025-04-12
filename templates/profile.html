@@ -8,4 +8,8 @@
   <textarea name="bio" rows="4" cols="50">{{ user.bio or '' }}</textarea><br>
   <button type="submit">프로필 업데이트</button>
 </form>
+<form method="POST" action="/profile/change_password">
+  <input type="text" placeholder="new password" name="new_password">
+  <input type="submit" value="password change">
+</form>
 {% endblock %}
