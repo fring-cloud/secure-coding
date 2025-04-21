@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %} 신고 목록 {% endblock %}
+
+{% block content %}
+<style>
+    td{
+        padding-left: 30px;
+        padding-right: 30px;
+        text-align: center;
+    }
+</style>
+<h1>신고 목록</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>신고자</th>
+            <th>대상</th>
+            <th>상세 보기</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+            <tr>
+                <td>{{ report.reporter_username }}</td>
+                <td>{{ report.target_username }}</td>
+                <td><a href="{{ url_for('view_report', report_id=report.report_id) }}">상세 보기</a></td>
+                <td>
+                    <form method="POST" action="/report_delete">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" value="{{report.report_id}}" name="del_report">
+                        <button style="margin-bottom: 0px;">처리 완료</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}장바구니{% endblock %}
+
+{% block content %}
+<h2>🛒 내 장바구니</h2>
+<hr/>
+
+{% if products %}
+  <ul class="product-list">
+    {% for product in products %}
+      <li style="border:1px solid #ccc;padding:10px;margin:10px 0;border-radius:6px;">
+        {%if product.image%}
+          <img src="{{ url_for('static', filename=product['image']) }}" width="100" style="float:left;margin-right:10px;">
+        {%else%}
+          <img src="/static/uploads/2025-03-31_222420.png" width="100" style="float:left;margin-right:10px;">
+        {%endif%}
+        <div style="overflow:hidden;">
+          <h4>{{ product['title'] }}</h4>
+          <p>가격: {{ product['price'] }} 원</p>
+          <p>{{ product['description'][:80] }}...</p>
+          
+          <form action="{{ url_for('buy_product', product_id=product['id']) }}" method="POST" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-primary" type="submit">구입하기</button>
+          </form>
+
+          <form action="{{ url_for('remove_from_cart', product_id=product['id']) }}" method="POST" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger" type="submit">삭제</button>
+          </form>
+        </div>
+        <div style="clear:both;"></div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>장바구니에 담긴 상품이 없습니다.</p>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← 돌아가기</a>
+{% endblock %}

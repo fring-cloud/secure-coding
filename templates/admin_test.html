@@ -2,32 +2,121 @@
 {% block title %} admin {% endblock %}
 {% block content %}
 <body>
-    <h1>Search Users and Products</h1>
+    <style>
+        .div_btn{
+            background-color: rgb(180, 175, 168);
+            border-radius: 5px;
+            width: 80px;
+            text-align: center;
+            height: 30px;
+        }
+        .div_btn:hover{
+            background-color: rgb(197, 155, 15);
+            color:white;
+        }
+        .a_btn{
+            text-decoration: none;
+            color: black;
+        }
+        .status{
+            /* border-radius: 5px; */
+            text-align: center;
+            width: 80px;
+        }
+        .pri{
+            width: 90px;
+            text-align: center;
+        }
+        .del_btn{
+            background-color: rgb(56, 32, 37);
+            border-radius: 5px;
+            width: 80px;
+            text-align: center;
+            height: 30px;
+        }
+        .del_btn:hover{
+            background-color: aliceblue;
+            color: black;
+        }
+        .u{
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+
+    <h1>Admin panel</h1>
     
-    <input type="text" id="search-input" placeholder="Enter username or product title">
-    <button onclick="performSearch()">Search</button>
-   
     <div style="display:flex">
-    	<div class="results" id="results-container">
-        <!-- 검색 결과가 여기에 동적으로 표시됩니다. -->
-    	</div>
-    	<div id="product_info">
-    	</div>
+    <input style="background-color: rgb(210, 231, 228);" type="text" id="search-input" placeholder="사용자 또는 제품명을 입력하여 검색.">
+    <button style="width:100px" onclick="performSearch(document.getElementById('search-input').value)">Search</button>
+    </div>
+    <hr/>
+    <div style="display: flex; justify-content: space-around;">
+        <a href="/admin_test"><div>목록 전체 조회</div></a>
+        <a href="javascript:performSearch(0);"><div>정지된 사용자 조회</div></a>
+        <a href="/admin/user_logs"><div>사용자 상세 정보</div></a>
+        <a href="/admin/reports"><div>신고 목록</div></a>
+    </div>
+    <hr/>
+    <div style="display:flex">
+        <div>
+            <div>User info</div>
+            <hr/>
+            <div class="results" id="results-container">
+            <!-- 사용자 정보 -->
+                {% for user in users%}
+                    {%if user.privilege == 0%}
+                        <ul style="padding-left: 0px;">
+                            <li style="display:flex; background-color: rgb(212, 238, 237); padding: 0px;border-radius: 5px;">
+                                <a class='u' href="javascript:performSearch('{{user.username}}')"><div style="width:150px;text-align: center;">{{user.username}}</div></a>
+                                <div class="pri">일반 사용자</div>
+                                {%if user.status == 1%}
+                                <div class="status" style="background-color: rgb(191, 225, 255);">사용 가능</div>
+                                <a class="a_btn" href="/user_freezing?sleep={{user.id}}"><div class="div_btn" >휴면 적용</div></a>
+                                {%else%}
+                                <div class="status" style="color:red;background-color:rgb(255, 191, 202);">계정 정지</div>
+                                <a class="a_btn" href="/user_wakeup?wakeup={{user.id}}"><div class="div_btn">휴면 해제</div></a>
+                                {%endif%}
+                                <a class="del" style="color:white; text-decoration: none; margin-left: 5px;" href="/admin/user_delete?del={{user.id}}"><div class="del_btn">계정 삭제</div></a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                {% endfor %}  
+            </div>
+        </div>
+        <!-- 사용자 정보 -->
+        <div style="margin-left: 10px;">
+            <div>product info</div>
+            <hr/>
+            <div id="product_info">
+                {%for product in products%}
+                <ul>
+                    <li style="display: flex;background-color: rgb(212, 238, 237); padding: 0px;border-radius: 5px;height: 30px;">
+                        <div style="width:160px;text-align: center;">{{product.title}}</div>
+                        <div style="width:100px;text-align: center;background-color: rgb(167, 199, 195);">{{product.price}}₩</div>
+                        <a class="del" style="color:white; text-decoration: none; margin-left: 5px;" href="/admin/content_delete?pro_id={{product.id}}"><div class="del_btn">게시물 삭제</div></a>
+                    </li>
+                </ul>
+                {%endfor%}
+            </div>
+        </div>
     </div>
 
     <script>
+        
+
+
         // performSearch 함수는 사용자가 입력한 검색어로 서버에 요청을 보냄
-        function performSearch() {
-            const query = document.getElementById('search-input').value; // 입력값 가져오기
+        function performSearch(a) {
+            const query = a;   //document.getElementById('search-input').value; // 입력값 가져오기
             const url = `/admin_test?query=${query}`; // Flask 서버의 /search 엔드포인트 호출
 
-            // fetch()를 사용하여 서버에서 JSON 데이터를 비동기적으로 가져옴
             fetch(url)
                 .then(response => response.json()) // JSON 응답을 파싱
                 .then(data => {
                     const resultsContainer = document.getElementById('results-container');
-		    const product_div = document.getElementById('product_info');
-		    product_div.innerHTML = '';
+		            const product_div = document.getElementById('product_info');
+		            product_div.innerHTML = '';
                     resultsContainer.innerHTML = ''; // 기존 결과 지우기
 
                     if (data.data.length === 0) {
@@ -36,22 +125,49 @@
                         // JSON 데이터를 HTML 형식으로 변환하여 페이지에 표시
                         data.data.forEach(item => {
                             const resultItem = document.createElement('ul');
-			    const product_list = document.createElement('ul');
-			    resultItem.style.display = "flex";
-			    product_list.style.display = "flex";
-                            resultItem.classList.add('result-item');
-                            resultItem.innerHTML = `
-                                <li>${item.username}</li>
-                                <li>${item.status}</li>
-                            `;
-			    
-			    product_list.innerHTML=`
-			    	<li>${item.title}</li>
-				<li>${item.price}</li>
-				<li>${item.product_decl}</li>
-				<li>{{data}}<li>
-			    `;
-			    product_div.appendChild(product_list);
+			                const product_list = document.createElement('ul');
+			                resultItem.style.display = "flex";
+                            resultItem.style.paddingLeft = "0px"
+			                product_list.style.display = "flex";
+
+                            // 사용자 정보 추가 로직
+                            if(item.privilege == 0){
+                                if(item.status == 1){
+                                    resultItem.innerHTML = `
+                                    <li style="display:flex;;padding:0px;background-color: rgb(212, 238, 237);border-radius: 5px;">
+                                        <a class='u' href="javascript:performSearch(${item.username})"><div style="width:150px;text-align: center;">${item.username}</div></a>
+                                        <div class="pri">일반 사용자</div>
+                                        <div class="status" style="background-color: rgb(191, 225, 255);">사용 가능</div>
+                                        <a class="a_btn" href="/user_freezing?sleep=${item.user_id}"><div class="div_btn" >휴면 적용</div></a>
+                                        <a class="del" style="color:white; text-decoration: none; margin-left: 5px;" href="/admin/user_delete?del=${item.user_id}"><div class="del_btn">계정 삭제</div></a>
+                                    </li>
+                                    `;
+                                }else{
+                                    resultItem.innerHTML = `
+                                    <li style="display:flex;padding:0px;background-color: rgb(212, 238, 237);border-radius: 5px;">
+                                        <a class='u' href="javascript:performSearch(${item.username})"><div style="width:150px;text-align: center;">${item.username}</div></a>
+                                        <div class="pri">일반 사용자</div>
+                                        <div class="status" style="color:red;background-color:rgb(255, 191, 202);">계정 정지</div>
+                                        <a class="a_btn" href="/user_wakeup?wakeup=${item.user_id}"><div class="div_btn">휴면 해제</div></a>
+                                        <a class="del" style="color:white; text-decoration: none; margin-left: 5px;" href="${item.user_id}"><div class="del_btn">계정 삭제</div></a>
+                                    </li>
+                                    `;
+                                }
+                            }
+                            // 사용자 정보 추가 로직 
+
+
+                            // 제품 정보 추가 로직 
+                            if(item.title != null){
+                                product_list.innerHTML=`
+                                <li style="display: flex;background-color: rgb(212, 238, 237); padding: 0px;border-radius: 5px;height: 30px;">
+                                    <div style="width:160px;text-align: center;">${item.title}</div>
+                                    <div style="width:100px;text-align: center;background-color: rgb(167, 199, 195);">${item.price}₩</div>
+                                    <a class="del" style="color:white; text-decoration: none; margin-left: 5px;" href=""><div class="del_btn">게시물 삭제</div></a>
+                                </li>
+                                `;
+                            }
+			                product_div.appendChild(product_list);
                             resultsContainer.appendChild(resultItem);
                         });
                     }

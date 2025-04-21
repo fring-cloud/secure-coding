@@ -3,98 +3,177 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}My Market{% endblock %}</title>
-  <!-- Socket.IO 클라이언트 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
   <style>
-    /* Notion 스타일 미니멀 디자인 */
     body {
-      background-color: #EFEFEF;
+      background-color: #ECF0F1; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
       color: #333;
     }
+
     nav {
-      background-color: #3F7D58;
-      height:60px;
-      border-bottom: 1px solid #e0e0e0;
+      background-color: #2C3E50; 
+      border-bottom: 2px solid #E0E0E0;
+      padding: 15px 20px;
     }
     nav a {
-      margin:0px;
+      margin: 0 15px;
       text-decoration: none;
-      color: black;
-      margin-right: 15px;
+      color: white;
       font-weight: 500;
-      align-items:center;
-      text-align: center;
+      font-size: 16px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
     }
+    nav a:hover {
+      background-color: #34495E; 
+    }
+
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 40px auto;
-      background-color: #fff;
+      background-color: #FFFFFF; 
       padding: 40px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
     }
+
     h1, h2, h3 {
       font-weight: 600;
       margin-bottom: 20px;
     }
+
     input, textarea, button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-bottom: 20px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #E0E0E0;
       border-radius: 4px;
       font-size: 16px;
     }
     button {
-      background-color: #007AFF;
-      color: #fff;
+      background-color: #2C3E50; 
+      color: white;
       border: none;
       cursor: pointer;
       transition: background-color 0.2s;
     }
     button:hover {
-      background-color: #005BB5;
+      background-color: #34495E; 
     }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #e0e0e0;
-    }
+
     .flash {
-      background-color: #FFECB3;
+      background-color: #FFECB3; 
       padding: 10px;
       border: 1px solid #FFB74D;
       border-radius: 4px;
       margin-bottom: 20px;
+      font-size: 14px;
+      color: #BF360C;
     }
-    /* 채팅 영역 스타일 */
     #chat {
       margin-top: 40px;
     }
     #messages {
       height: 200px;
       overflow-y: auto;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #E0E0E0;
       padding: 10px;
       border-radius: 4px;
       margin-bottom: 10px;
-      background-color: #fafafa;
+      background-color: #FAFAFA; 
     }
-    .va{
-	height:60px;
-	align-items:center;
-	text-align:center;
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      nav {
+        padding: 10px 20px;
+      }
+      nav a {
+        margin: 5px 10px;
+      }
     }
-    .va:hover{
-	background-color:#EC5228;
-	border-radius:3px;
-    }
+    .chat-panel {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    padding: 0px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .chat-panel.open {
+    left: 0;
+  }
+  .chat-panel h3 {
+    margin-top: 0;
+  }
+  .chat-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .search-panel {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100%;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    padding: 10px;
+    transition: right 0.3s ease;
+    z-index: 1000;
+  }
+
+  .search-panel.open {
+    right: 0;
+  }
+
+  .search-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .search-panel input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  #searchResults {
+    list-style: none;
+    margin-top: 20px;
+    padding: 0;
+  }
+
+  #searchResults li {
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #333;
+  }
+</style>
   </style>
 </head>
 <body>
@@ -102,14 +181,84 @@
     {% if session.get('user_id') %}
     <div style="display:flex;justify-content:space-between;">
       <div style="display:flex; justify-content:space-between">
-	      <a href="{{ url_for('dashboard') }}"><div class="va">대시보드</div></a>
-	      <a href="{{ url_for('profile') }}"><div class="va">프로필</div></a>
-	      <a href="{{ url_for('report') }}"><div class="va">신고하기</div></a>
+        <a href="{{ url_for('dashboard') }}">대시보드</a>
+        {% if not session.get('is_admin') %}
+          <a href="{{ url_for('profile') }}">프로필</a>
+          <a href="{{ url_for('report') }}">신고하기</a>
+          <a href="{{ url_for('view_cart') }}">장바구니 보기</a>
+          <a href="javascript:void(0);" onclick="toggleChatPanel()">1대1 채팅</a>
+        {%endif%}
+        <a href="javascript:void(0);" onclick="toggleSearchPanel()">사용자 검색</a>
+        {% if session.get('is_admin') %}
+          <a href="{{ url_for('admin_test') }}">관리자 페이지</a>
+        {%endif%}
       </div>
-      <a href="{{ url_for('logout') }}"><div class="va">로그아웃</div></a>
+      <a href="{{ url_for('logout') }}">로그아웃</a>
     </div>
+    <div id="chatPanel" class="chat-panel">
+      <button class="close-btn" onclick="toggleChatPanel()">✖</button>
+      <h3></h3>
+      <ul id="chatRoomList">
+        <!-- 채팅방 리스트가 여기에 삽입됨 -->
+        <ul>
+          {% for room in chat_rooms %}
+            <li style="margin-bottom: 10px;">
+              <a href="{{ url_for('chat_room', room_id=room['id']) }}" style="padding:0px">
+                {{ room.partner_name }}
+              </a>
+              <form action="{{ url_for('leave_chat', room_id=room['id']) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="margin-bottom: 0px; font-size:12px;width:100px">나가기</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </ul>
+    </div>
+    <div id="searchPanel" class="search-panel">
+      <button class="close-btn" onclick="toggleSearchPanel()">✖</button>
+      <h3>사용자 검색</h3>
+      <input type="text" id="searchInput" placeholder="사용자명 또는 상품명">
+      <ul id="searchResults"></ul>
+    </div>
+
+    <script>
+      function toggleChatPanel() {
+        const panel = document.getElementById('chatPanel');
+        panel.classList.toggle('open');
+      }
+    </script>
+    <script>
+      function toggleSearchPanel() {
+        const panel = document.getElementById('searchPanel');
+        panel.classList.toggle('open');
+      }
+    
+      // 간단한 fetch를 통해 검색 (AJAX)
+      document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value;
+        if (query.length < 2) {
+          document.getElementById('searchResults').innerHTML = '';
+          return;
+        }
+    
+        fetch(`/search_user?q=${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => {
+            const results = document.getElementById('searchResults');
+            results.innerHTML = '';
+            data.forEach(user => {
+              const li = document.createElement('li');
+              const div = document.createElement('div');
+              div.textContent = `${user.username}`
+              li.appendChild(div);
+              results.appendChild(li);
+            });
+          });
+      });
+    </script>
     {% else %}
-      <a href="{{ url_for('login') }}">로그인</a>
+      <a href="{{ url_for('index') }}">로그인</a>
       <a href="{{ url_for('register') }}">회원가입</a>
     {% endif %}
   </nav>

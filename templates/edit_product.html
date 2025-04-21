@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}상품 수정{% endblock %}
+{% block content %}
+<h2>상품 수정</h2>
+<hr>
+
+<form method="POST" enctype="multipart/form-data">
+  <div>
+    <label for="title">제목:</label><br>
+    <input type="text" name="title" id="title" value="{{ product['title'] }}" required style="width: 100%; padding: 8px;">
+  </div>
+
+  <div style="margin-top: 15px;">
+    <label for="description">설명:</label><br>
+    <textarea name="description" id="description" rows="6" required style="width: 100%; padding: 8px;">{{ product['description'] }}</textarea>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <label for="price">가격 (₩):</label><br>
+    <input type="text" name="price" id="price" value="{{ product['price'] }}" required style="width: 100%; padding: 8px;">
+  </div>
+
+  <div style="margin-top: 15px;">
+    <label>이미지 변경 (드래그 앤 드롭 또는 클릭):</label>
+    <div id="drop-area" style="border: 2px dashed #ccc; padding: 20px; text-align: center; margin-top: 10px;">
+      <p>이미지를 이 영역에 드래그하거나 클릭하여 선택하세요</p>
+      <input type="file" name="file" id="fileInput" style="display: none;" accept="image/*">
+      <img id="preview" src="{{ url_for('static', filename=product['image']) }}" style="margin-top: 10px; max-width: 300px;">
+    </div>
+  </div>
+
+  <hr>
+  <div style="display: flex; gap: 10px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-success">수정 완료</button>
+    <a href="{{ url_for('view_product', product_id=product['id']) }}" class="btn btn-secondary">돌아가기</a>
+  </div>
+</form>
+
+<script>
+  const dropArea = document.getElementById('drop-area');
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+
+  // 클릭 시 input 열기
+  dropArea.addEventListener('click', () => fileInput.click());
+
+  // 파일 드래그 처리
+  dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.style.borderColor = '#666';
+  });
+
+  dropArea.addEventListener('dragleave', () => {
+    dropArea.style.borderColor = '#ccc';
+  });
+
+  dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      fileInput.files = e.dataTransfer.files;
+      previewFile(file);
+    }
+  });
+
+  // 파일 선택 시 미리보기
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) {
+      previewFile(fileInput.files[0]);
+    }
+  });
+
+  function previewFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+{% endblock %}

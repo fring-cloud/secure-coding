@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %} 신고 상세 {% endblock %}
+
+{% block content %}
+<h1>신고 상세 보기</h1>
+
+<table>
+    <tr>
+        <th>신고 ID</th>
+        <td>{{ report.report_id }}</td>
+    </tr>
+    <tr>
+        <th>신고자</th>
+        <td>{{ report.reporter_username }}</td>
+    </tr>
+    <tr>
+        <th>대상</th>
+        <td>{{ report.target_username }}</td>
+    </tr>
+    <tr>
+        <hr/>
+        <th>신고 사유</th>
+        <td>{{ report.report_reason }}</td>
+    </tr>
+</table>
+<hr/>
+<a href="{{ url_for('reports') }}">신고 목록으로 돌아가기</a>
+{% endblock %}

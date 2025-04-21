@@ -1,18 +1,173 @@
 {% extends "base.html" %}
 {% block title %}상품 상세보기{% endblock %}
 {% block content %}
+<style>
+
+  /* body {
+    background-color: #ECF0F1; 
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  } */
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2C3E50; /* 네이비 색상 */
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  hr {
+    border: 1px solid #E0E0E0;
+  }
+
+  .in {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  ul li {
+    font-size: 16px;
+    color: #333;
+    margin-right: 20px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    background-color: #2C3E50; /* 네이비 색상 */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+    display: inline-block;
+  }
+
+  .btn:hover {
+    background-color: #34495E; /* 네이비 색상 강조 */
+    transform: scale(1.05); /* 호버 시 살짝 확대 */
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #2C3E50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background-color: #34495E; /* 네이비 색상 강조 */
+  }
+
+  .product-info {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+  }
+
+  .product-description {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    visibility: visible; /* 보이도록 설정 */
+    display: block; /* 요소가 block으로 표시되도록 설정 */
+    opacity: 1; /* 투명도를 1로 설정하여 보이도록 설정 */
+  }
+
+  .price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2C3E50; /* 네이비 색상 */
+  }
+
+  .seller {
+    font-size: 16px;
+    color: #7F8C8D; /* 연한 회색 */
+  }
+
+  /* 구입 버튼과 장바구니 버튼을 하나로 묶기 */
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .action-buttons form {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  
+</style>
+
 <h2>{{ product.title }}</h2>
 <hr />
-<img src="{{product.image}}"></img>
+{%if product.image %}
+  <img src="{{ url_for('static', filename=product['image']) }}" alt="{{ product.title }}">
+{% else %}
+  <img src="/static/uploads/2025-03-31_222420.png" alt="기본 이미지">
+{%endif%}
 <hr />
-<div>
-  <ul style="display:flex;justify-content:space-between">	
+
+<div class="product-info">
+  <ul class="in">
     <li>판매자: {{ seller.username if seller else '알 수 없음' }}</li>
-    <li>가격: {{ product.price }}</li>
-    <li style="background-color:#99BC85;border-radius:4px;cursor:pointer;"><a href="/chating?seller={{seller.username}}">chating</a></li>
+    <li class="price">가격: {{ product.price }}₩</li>
+    <li style="background-color:#2C3E50; border-radius: 4px; cursor: pointer; padding:10px">
+      <a href="{{ url_for('start_chat', other_id=seller.id) }}" style="text-decoration: none; color: rgb(255, 255, 255);">💬 채팅하기</a>
+    </li>
   </ul>
+
+  {% if session['user_id'] != product['seller_id'] %}  
+    <hr/>
+    <div class="action-buttons">
+      <form action="{{ url_for('buy_product', product_id=product['id']) }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" style="margin-bottom: 0px;">구입하기</button>
+      </form>
+      <form action="{{ url_for('add_to_cart', product_id=product['id']) }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" style="margin-bottom: 0px;">🛒 장바구니 담기</button>
+      </form>
+    </div>
+  {% endif %}
 </div>
-<hr />
-<hr />
-<p>{{ product.description }}</p>
+
+<hr/>
+
+<div class="product-description">
+  <p>{{ product.description}}</p>
+</div>
+
+
+{% if session['user_id'] == product['seller_id'] or session.get('is_admin') %}
+  <div class="action-buttons">
+    <a href="{{ url_for('edit_product', product_id=product['id']) }}" class="btn" >수정</a>
+    <form action="{{ url_for('delete_product', product_id=product['id']) }}" method="post" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn" onclick="return confirm('정말 삭제하시겠습니까?')" style="margin-bottom: 0px;">삭제</button>
+    </form>
+  </div>
+{% endif %}
+
 {% endblock %}

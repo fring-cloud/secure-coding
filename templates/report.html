@@ -8,6 +8,7 @@
 	  <option id="user" name="user" value="user">사용자</option>
 	  <option id="product" name="product" value="product">상품</option>
   </select>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="text" name="target_id" required placeholder="신고 대상의 이름을 입력 하세요."><br>
   신고 사유: <br>
   <textarea name="reason" rows="4" cols="50" required></textarea><br>

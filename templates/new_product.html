@@ -6,6 +6,7 @@
   image <input type="file" name="file">
   제목: <input type="text" name="title" required><br>
   설명: <br>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <textarea name="description" rows="4" cols="50" required></textarea><br>
   가격: <input type="text" name="price" required><br>
   <button type="submit">등록하기</button>
