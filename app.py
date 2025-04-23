@@ -641,7 +641,7 @@ def edit_product(product_id):
         if f:
             if not is_valid_image(f):
                 flash('유효하지 않은 이미지 파일입니다.')
-                return redirect(url_for('new_product'))
+                return redirect(url_for('edit_product'))
 
 
         # 입력 값에 대한 유효성 검사 (제목, 설명, 가격, 파일 확장자 등)
