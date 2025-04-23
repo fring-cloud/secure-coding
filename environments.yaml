@@ -1,1 +1,14 @@
+name: shopping
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - flask 
+      - flask-socketio
+      - flask-sqlalchemy
+      - werkzeug
+      - flask-wtf
+      - python-dotenv
  
