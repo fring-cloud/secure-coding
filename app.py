@@ -1325,4 +1325,4 @@ def handle_chat_message(data):
 
 if __name__ == '__main__':
     init_db()  
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=False) # 실제 서비스 할 때, debug 모드 False로 변경  
