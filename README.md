@@ -1,15 +1,15 @@
 # secure-coding
 
-## 가상 환경 생성 및 서비스 가동 
+## 🚀가상 환경 생성 및 서비스 가동 
 
 1. `git https://github.com/fring-cloud/secure-coding.git` <br/>
 2. `cd ./secure-coding` <br/>
 3. `conda env create --file environments.yaml`
 4. `conda activate shopping`
-5. 윈도우 = `python app,py`, 리눅스 = `python3 app.py`
+5. 윈도우 = `python app.py`, 리눅스 = `python3 app.py`
 
 ---
-## 사용 가능한 계정 목록 ↓
+## 🎭사용 가능한 계정 목록 ↓
 ### 관리자 계정
 ---
 
