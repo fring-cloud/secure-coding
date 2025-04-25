@@ -6,7 +6,7 @@
 2. `cd ./secure-coding` <br/>
 3. `conda env create --file environments.yaml`
 4. `conda activate shopping`
-5. 윈도우즈 = `python app.py` |  리눅스 = `python3 app.py`
+5. 윈도우즈 : `python app.py` |  리눅스 : `python3 app.py`
 
 ---
 ## 🎭사용 가능한 계정 목록 ↓
