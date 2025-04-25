@@ -12,11 +12,14 @@
 ## 사용 가능한 계정 목록 ↓
 ### 관리자 계정
 ---
+
 ID : sys_root_falcon <br/>
-Dl@#zxcls-_3skwa <br/>
+PW : Dl@#zxcls-_3skwa <br/>
+
 ---
 ### 일반 사용자 계정
 ---
+
 ID : qqqqqqqq <br/>
 PW : qqqqqqqqQ1! <br/>
 
