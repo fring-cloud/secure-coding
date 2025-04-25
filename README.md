@@ -2,7 +2,7 @@
 
 ## 🚀가상 환경 생성 및 서비스 가동 
 
-1. `git https://github.com/fring-cloud/secure-coding.git` <br/>
+1. `git clone https://github.com/fring-cloud/secure-coding.git` <br/>
 2. `cd ./secure-coding` <br/>
 3. `conda env create --file environments.yaml`
 4. `conda activate shopping`
